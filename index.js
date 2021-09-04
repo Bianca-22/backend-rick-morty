@@ -56,14 +56,14 @@ const ObjectId = mongodb.ObjectId;
     app.post('/personagens', async(req,res) =>{
         const objeto = req.body;
         
-        if(!objeto || !objeto.nome || !objeto.imageUrl){
+        if(!objeto || !objeto.nome || !objeto.imagemUrl){
             res.send("Preencha todos os campos.");
             return;
         };
 
         const result = await personagens.insertOne(objeto);
 
-		console.log(result);
+		//console.log(result);
 
 		if (result.acknowledged == false) {
 			res.send("Ocorreu um erro");
