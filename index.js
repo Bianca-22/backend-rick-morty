@@ -77,7 +77,7 @@ const ObjectId = mongodb.ObjectId;
 		const id = req.params.id;
 		const objeto = req.body;
 
-		if (!objeto || !objeto.nome || !objeto.imageUrl) {
+		if (!objeto || !objeto.nome || !objeto.imagemUrl) {
 			res.send("Preencha todos os campos.");
 			return;
 		}
