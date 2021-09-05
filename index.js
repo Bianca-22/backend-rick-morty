@@ -50,6 +50,12 @@ const ObjectId = mongodb.ObjectId;
     app.get('/personagens/:id', async (req, res) =>{
         const id = req.params.id;
         const personagem = await getPersonagemById(id);
+
+		if (!personagem) {
+			res.status(404).send({ error: "O personagem não foi encontrado" });
+			return;
+		}
+
         res.send(personagem);
     });
 
@@ -57,7 +63,7 @@ const ObjectId = mongodb.ObjectId;
         const objeto = req.body;
         
         if(!objeto || !objeto.nome || !objeto.imagemUrl){
-            res.send("Preencha todos os campos.");
+            res.status(400).send({error: "Personagem inválido, preencha todos os campos."});
             return;
         };
 
@@ -66,7 +72,7 @@ const ObjectId = mongodb.ObjectId;
 		//console.log(result);
 
 		if (result.acknowledged == false) {
-			res.send("Ocorreu um erro");
+			res.status(500).send({error: "Ocorreu um erro"});
 			return;
 		}
 
@@ -78,7 +84,7 @@ const ObjectId = mongodb.ObjectId;
 		const objeto = req.body;
 
 		if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-			res.send("Preencha todos os campos.");
+			res.status(400).send({error: "Preencha todos os campos para alterar o personagem com sucesso."});
 			return;
 		}
 
@@ -87,7 +93,7 @@ const ObjectId = mongodb.ObjectId;
 		});
 
 		if (quantidadePersonagens !== 1) {
-			res.send("Personagem não encontrado");
+			res.status(404).send({error: "Personagem não encontrado"});
 			return;
 		}
 
@@ -100,8 +106,8 @@ const ObjectId = mongodb.ObjectId;
 			}
 		);
 
-		if (result.modifiedCount !== 1) {
-			res.send("Ocorreu um erro ao atualizar o personagem");
+		if (result.acknowledged == "undefined") {
+			res.status(500).send({ error: "Ocorreu um erro ao atualizar o personagem" });
 			return;
 		}
 		res.send(await getPersonagemById(id));
@@ -115,7 +121,7 @@ const ObjectId = mongodb.ObjectId;
 		});
 		
 		if (quantidadePersonagens !== 1) {
-			res.send("Personagem não encontrao");
+			res.status(404).send({error: "Personagem não encontrao"});
 			return;
 		}
 		
@@ -124,11 +130,11 @@ const ObjectId = mongodb.ObjectId;
 		});
 		
 		if (result.deletedCount !== 1) {
-			res.send("Ocorreu um erro ao remover o personagem");
+			res.status(500).send({error: "Ocorreu um erro ao remover o personagem"});
 			return;
 		}
 
-		res.send("Personagem removido com sucesso!");
+		res.send(204);
 	});
 
     app.listen(port, ()=>{
