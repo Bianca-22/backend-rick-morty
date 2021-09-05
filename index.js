@@ -1,6 +1,7 @@
 const express = require("express");
 const mongodb = require("mongodb");
 require("dotenv").config();
+require("express-async-errors");
 
 const ObjectId = mongodb.ObjectId;
 
@@ -135,6 +136,19 @@ const ObjectId = mongodb.ObjectId;
 		}
 
 		res.send(204);
+	});
+
+	app.all("*", function (req, res) {
+		res.status(404).send({ message: "Endpoint was not found" });
+	});
+
+	app.use((error, req, res, next) => {
+		res.status(error.status || 500).send({
+			error: {
+				status: error.status || 500,
+				message: error.message || "Internal Server Error",
+			},
+		});
 	});
 
     app.listen(port, ()=>{
