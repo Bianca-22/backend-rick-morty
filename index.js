@@ -1,7 +1,7 @@
 const express = require("express");
 const mongodb = require("mongodb");
 require("dotenv").config();
-require("express-async-errors");
+require("express-async-error");
 
 const ObjectId = mongodb.ObjectId;
 
