@@ -1,142 +1,47 @@
 const express = require("express");
-const mongodb = require("mongodb");
-require("dotenv").config();
 require("express-async-error");
+require("dotenv").config();
+var cors = require("cors");
 
-const ObjectId = mongodb.ObjectId;
+const home = require("./components/home/home");
+const readAll = require("./components/read_all/read_all");
+const create = require("./components/create/create");
+const update = require("./components/update/update");
+const deletar = require("./components/delete/delete");
+const readById = require("./components/read_by_id/read_by_id");
 
 (async () => {
-    const dbUser = process.env.DB_USER;
-    const dbPassword = process.env.DB_PASSWORD;
-    const dbName = process.env.DB_NAME;
-	const dbChar = process.env.DB_CHAR;
-
     const app = express();
     app.use(express.json());
+	const port = process.env.PORT || 3000;
 
-    const port = process.env.PORT || 3000;
-    const connectionString = `mongodb+srv://${dbUser}:${dbPassword}@cluster0.${dbChar}.mongodb.net/${dbName}?retryWrites=true&w=majority`;
-    const options = {
-        useUnifiedTopology: true
-    };
+	// CORS - Novo
+	app.use(cors());
 
-    const client = await mongodb.MongoClient.connect(connectionString, options);
-    const db = client.db("personagens_db");
-    const personagens = db.collection("personagens");
+	app.options("*", cors());
 
-    const getPersonagensValidos = () => personagens.find({}).toArray();
-    const getPersonagemById = async(id) => personagens.findOne({_id: ObjectId(id)});
-    
-    app.all("/*", (req, res, next) => {
-		res.header("Access-Control-Allow-Origin", "*");
+	// CORS - Antigo
+		// app.all("/*", (req, res, next) => {
+		// 	res.header("Access-Control-Allow-Origin", "*");
+		// 	res.header("Access-Control-Allow-Methods", "*");
+		// 	res.header(
+		// 		"Access-Control-Allow-Headers",
+		// 		"Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
+		// 	);
+		// 	next();
+		// });
 
-		res.header("Access-Control-Allow-Methods", "*");
+	app.use('/home', home);
 
-		res.header(
-			"Access-Control-Allow-Headers",
-			"Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Authorization"
-		);
+    app.use('/read_all', readAll);
 
-		next();
-	});
+    app.use('/read_by_id', readById);
 
-    app.get('/', (req,res) => {
-        res.send({info: "Hey Guys!!"})
-    });
+    app.use('/create', create);
 
-    app.get('/personagens', async (req,res) => {
-        res.send(await getPersonagensValidos())
-    });
+    app.use('/update', update);
 
-    app.get('/personagens/:id', async (req, res) =>{
-        const id = req.params.id;
-        const personagem = await getPersonagemById(id);
-
-		if (!personagem) {
-			res.status(404).send({ error: "O personagem não foi encontrado" });
-			return;
-		}
-
-        res.send(personagem);
-    });
-
-    app.post('/personagens', async(req,res) =>{
-        const objeto = req.body;
-        
-        if(!objeto || !objeto.nome || !objeto.imagemUrl){
-            res.status(400).send({error: "Personagem inválido, preencha todos os campos."});
-            return;
-        };
-
-        const result = await personagens.insertOne(objeto);
-
-		//console.log(result);
-
-		if (result.acknowledged == false) {
-			res.status(500).send({error: "Ocorreu um erro"});
-			return;
-		}
-
-        res.send(objeto)
-    });
-
-    app.put("/personagens/:id", async (req, res) => {
-		const id = req.params.id;
-		const objeto = req.body;
-
-		if (!objeto || !objeto.nome || !objeto.imagemUrl) {
-			res.status(400).send({error: "Preencha todos os campos para alterar o personagem com sucesso."});
-			return;
-		}
-
-		const quantidadePersonagens = await personagens.countDocuments({
-			_id: ObjectId(id),
-		});
-
-		if (quantidadePersonagens !== 1) {
-			res.status(404).send({error: "Personagem não encontrado"});
-			return;
-		}
-
-		const result = await personagens.updateOne(
-			{
-				_id: ObjectId(id),
-			},
-			{
-				$set: objeto,
-			}
-		);
-
-		if (result.acknowledged == "undefined") {
-			res.status(500).send({ error: "Ocorreu um erro ao atualizar o personagem" });
-			return;
-		}
-		res.send(await getPersonagemById(id));
-	});
-
-	app.delete("/personagens/:id", async (req, res) => {
-		const id = req.params.id;
-
-		const quantidadePersonagens = await personagens.countDocuments({
-			_id: ObjectId(id),
-		});
-		
-		if (quantidadePersonagens !== 1) {
-			res.status(404).send({error: "Personagem não encontrao"});
-			return;
-		}
-		
-		const result = await personagens.deleteOne({
-			_id: ObjectId(id),
-		});
-		
-		if (result.deletedCount !== 1) {
-			res.status(500).send({error: "Ocorreu um erro ao remover o personagem"});
-			return;
-		}
-
-		res.send(204);
-	});
+	app.use('/delete', deletar);
 
 	app.all("*", function (req, res) {
 		res.status(404).send({ message: "Endpoint was not found" });
@@ -152,6 +57,6 @@ const ObjectId = mongodb.ObjectId;
 	});
 
     app.listen(port, ()=>{
-    console.info(`App rodando em http://localhost:${port}`)
+    console.info(`App rodando em http://localhost:${port}/home`)
     });
 })();
