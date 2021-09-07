@@ -1,6 +1,4 @@
 const express = require("express");
-const mongodb = require("mongodb");
-const ObjectId = mongodb.ObjectId;
 require("dotenv").config();
 require("express-async-errors");
 var cors = require("cors");
@@ -8,15 +6,13 @@ var cors = require("cors");
 const home = require("./components/home/home");
 const readAll = require("./components/read_all/read_all");
 const readById = require("./components/read_by_id/read_by_id");
-//const del = require("./components/delete/delete");
+const del = require("./components/delete/delete");
 const update = require("./components/update/update");
 const criar = require("./components/create/create");
 
 (async () => {
-
 	const app = express();
 	app.use(express.json());
-
 	const port = process.env.PORT || 3000;
 
 	//CORS
@@ -39,7 +35,7 @@ const criar = require("./components/create/create");
 	app.use("/personagens/update/", update);
 
 	//[DELETE] Deleta um personagem
-	//app.use("/personagens/delete/", del);
+	app.use("/personagens/delete/", del);
 
 	//Tratamento de erros
 	//Middleware verificar endpoints
