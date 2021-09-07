@@ -27,7 +27,7 @@ const ObjectId = mongodb.ObjectId;
         //console.log("Time: ", Date.now());
     });
 
-    router.get('/personagens/:id', async (req, res) =>{
+    router.get('/:id', async (req, res) =>{
         const id = req.params.id;
         const personagem = await getPersonagemById(id);
 
@@ -38,6 +38,6 @@ const ObjectId = mongodb.ObjectId;
 
         res.send(personagem);
     });
-});
+})();
 
 module.exports = router;

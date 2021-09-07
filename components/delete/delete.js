@@ -3,9 +3,8 @@ const router = express.Router();
 const mongodb = require("mongodb");
 require("dotenv").config();
 
-const ObjectId = mongodb.ObjectId;
-
-    (async () => {
+(async () => {
+    const ObjectId = mongodb.ObjectId;
     const dbUser = process.env.DB_USER;
     const dbPassword = process.env.DB_PASSWORD;
     const dbName = process.env.DB_NAME;
@@ -25,7 +24,7 @@ const ObjectId = mongodb.ObjectId;
         //console.log("Time: ", Date.now());
     });
 
-    app.delete("/personagens/:id", async (req, res) => {
+    app.delete("/:id", async (req, res) => {
         const id = req.params.id;
 
         const quantidadePersonagens = await personagens.countDocuments({
@@ -48,5 +47,6 @@ const ObjectId = mongodb.ObjectId;
 
         res.send(204);
     });
-});
+})();
+
 module.exports = router;

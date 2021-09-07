@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongodb = require("mongodb");
+require("dotenv").config();
 (async () => {
 	const dbUser = process.env.DB_USER;
 	const dbPassword = process.env.DB_PASSWORD;
@@ -12,7 +13,7 @@ const mongodb = require("mongodb");
 	};
 	const client = await mongodb.MongoClient.connect(connectionString, options);
 
-	const db = client.db("blue_db");
+	const db = client.db("personagens_db");
 	const personagens = db.collection("personagens");
 
 	const getPersonagensValidas = () => personagens.find({}).toArray();
@@ -20,7 +21,7 @@ const mongodb = require("mongodb");
 	//Middleware - especifica que é esse o import do router no index que queremos utilizar
 	router.use(function timelog(req, res, next) {
 		next();
-		console.log("Time: ", Date.now());
+		//console.log("Time: ", Date.now());
 	});
 
 	//[GET] GetAllPersonagens
